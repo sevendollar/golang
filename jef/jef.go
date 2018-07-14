@@ -9,3 +9,7 @@ func Greet(x interface{}) {
 func Add(x, y int) int {
 	return x + y
 }
+
+func fuck() {
+	fmt.Println("fuck!")
+}
