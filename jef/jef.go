@@ -7,5 +7,5 @@ func Greet(x interface{}) {
 }
 
 func Add(x, y int) int {
-	fmt.Println(x + y)
+	return x + y
 }
