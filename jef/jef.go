@@ -10,6 +10,6 @@ func Add(x, y int) int {
 	return x + y
 }
 
-func fuck() {
+func Fuck() {
 	fmt.Println("fuck!")
 }
