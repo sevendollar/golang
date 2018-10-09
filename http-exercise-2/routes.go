@@ -4,14 +4,14 @@ import (
         "fmt"
         "golang.org/x/crypto/bcrypt"
         "html/template"
-        "jef/data"
         "net/http"
         "strconv"
         "time"
+        "web/data"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
-        t, err := template.ParseFiles("templates/index.html")
+        t, err := template.ParseFiles("web/templates/index.html")
         if err != nil {
                 return
         }
@@ -19,7 +19,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func signup(w http.ResponseWriter, r *http.Request) {
-        t, err := template.ParseFiles("templates/signup.html")
+        t, err := template.ParseFiles("web/templates/signup.html")
         if err != nil {
                 return
         }
@@ -52,7 +52,7 @@ func process_signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func signin(w http.ResponseWriter, r *http.Request) {
-        t, err := template.ParseFiles("templates/signin.html")
+        t, err := template.ParseFiles("web/templates/signin.html")
         if err != nil {
                 return
         }
@@ -129,4 +129,3 @@ func verify(w http.ResponseWriter, r *http.Request) {
         }
         fmt.Fprintf(w, "hi %v, you're now %v years old.", u.Name, u.Age)
 }
-
