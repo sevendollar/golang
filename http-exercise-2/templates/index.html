@@ -1,9 +1,26 @@
 <html>
 
+<head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        div {
+                margin: auto;
+                text-align: center;
+                font-size: 5vw;
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        }
+        </style>
+</head>
 <body>
-        <h2>WELCOME BACK {{ . }}</h2>
-<br/>
-<a href=/signout>Sign Out</a>
+        <div>
+            Welcome back <span style="color:blue; font-size:6vw;">{{ .Name }}</span>  
+            <br/>
+            UUID: <span style="color: red">{{ .Uuid }}</span>
+            <br/>
+            <br/>
+            <a href=/signout>Sign Out</a>
+        </div>
+        <br/>
 </body>
 </html>
 

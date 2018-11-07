@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 	"web/data"
 )
@@ -23,13 +22,30 @@ func index(w http.ResponseWriter, r *http.Request) {
 		u := &data.User{}
 		u, err = data.GetUserBySessionUuid(session_id.Value)
 		if err != nil {
+			t, err := template.ParseFiles("/go/src/web/templates/index_guest.html")
+			if err != nil {
+				return
+			}
+			t.Execute(w, "")
 			return
 		}
 		t, err := template.ParseFiles("/go/src/web/templates/index.html")
 		if err != nil {
 			return
 		}
-		t.Execute(w, strings.ToUpper(u.Name))
+		t.Execute(w, u)
+
+		t, err = template.ParseFiles("/go/src/web/templates/getAllUsers.html")
+		if err != nil {
+			return
+		}
+		users := []data.User{}
+		users, err = data.GetAllUsers()
+		if err != nil {
+			return
+		}
+		t.Execute(w, users)
+
 	}
 }
 
@@ -94,7 +110,7 @@ func signout(w http.ResponseWriter, r *http.Request) {
 		MaxAge:  -1,
 		Expires: time.Unix(1, 0),
 	})
-	fmt.Fprintln(w, "you're sign-outed!")
+	http.Redirect(w, r, "/", 302)
 }
 
 func autheticate(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +143,7 @@ func autheticate(w http.ResponseWriter, r *http.Request) {
 			HttpOnly: true,
 		})
 
-		fmt.Fprintln(w, "Sign In Succeed!")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
@@ -140,5 +156,5 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "hi guest")
 		return
 	}
-	fmt.Fprintf(w, "hi %v, you're now %v years old.", u.Name, u.Age)
+	fmt.Fprintf(w, "hi %v, you're now %v years old and your UUID is: %v", u.Name, u.Age, u.Uuid)
 }

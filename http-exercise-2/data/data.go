@@ -101,6 +101,15 @@ func GetUserBySessionUuid(session_uuid string) (u *User, err error) {
 	return
 }
 
+func GetAllUsers() (us []User, err error) {
+	u := User{}
+	iter := col_user.Find(bson.M{}).Iter()
+	for iter.Next(&u) {
+		us = append(us, u)
+	}
+	return
+}
+
 func (u *User) Update() (err error) {
 	count, err := col_user.Find(bson.M{"uuid": u.Uuid}).Count()
 	if err != nil {

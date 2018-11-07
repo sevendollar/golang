@@ -1,0 +1,49 @@
+<style>
+#customers {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+}
+
+#customers td, #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ff66cc;}
+
+#customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+}
+</style>
+
+<table id="customers">
+        <tr>
+                <th>Name</th>
+                <th>UUID</th>
+                <th>Sex</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Created At</th>
+        </tr>
+        {{ if . }}
+        {{ range . }}
+        <tr>
+                <td>{{ .Name }}</td>
+                <td>{{ .Uuid }}</td>
+                <td>{{ .Sex }}</td>
+                <td>{{ .Age }}</td>
+                <td>{{ .Email }}</td>
+                <td>{{ .CreatedAt }}</td>
+        </tr>
+        {{ end }}
+        {{ else }}
+        nothing to show...
+        {{ end }}
+</table>
