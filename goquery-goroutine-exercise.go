@@ -18,7 +18,9 @@ const (
 )
 
 var (
-        wg sync.WaitGroup
+        wg       sync.WaitGroup
+        port     string
+        filepath string
 )
 
 func getHref(url string) (hrefs []string, err error) {
@@ -94,22 +96,29 @@ func downloaderWraper() {
 
 func fileChecker() {
         defer wg.Done()
-        var fileExist bool
-        files, err := ioutil.ReadDir("/tmp")
-        if err != nil {
-                fmt.Println("Error:", err)
-                return
-        }
-        if len(files) != 0 {
-                for _, v := range files {
-                        fileExist = fileExist || strings.Contains(v.Name(), ".pdf")
+
+        for {
+                fileExist := false
+                files, err := ioutil.ReadDir("/tmp")
+                if err != nil {
+                        fmt.Println("Error:", err)
+                        return
                 }
-        }
-        for !fileExist {
-                downloaderWraper()
-                fmt.Println("getting file...")
+                if len(files) != 0 {
+                        for _, v := range files {
+                                fileExist = fileExist || strings.Contains(v.Name(), ".pdf")
+                        }
+                }
+
+                fmt.Println(fileExist, time.Now())
+
+                if !fileExist {
+                        downloaderWraper()
+                        fmt.Println("getting file...")
+                }
                 time.Sleep(time.Duration(30) * time.Second)
         }
+        fmt.Println("exit fileChecker()")
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -124,13 +133,18 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+        filepath = "c:\temp"
+        filepath = "/tmp"
+        port = "80"
+
         mux := http.NewServeMux()
         server := &http.Server{
-                Addr:    ":80",
+                Addr:    ":" + port,
                 Handler: mux,
         }
+
         mux.HandleFunc("/", index)
-        mux.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir("/tmp"))))
+        mux.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir(filepath))))
 
         //downloaderWraper()
 
