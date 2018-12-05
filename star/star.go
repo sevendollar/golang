@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -28,7 +29,7 @@ var (
 )
 
 func GetStar(starIndex []int, dayIndex int) (r string, err error) {
-	getInfo := func(i int, dayIndex int) (t string, err error) {
+	getInfo := func(i int, dayIndex int) (r string, err error) {
 		yy, mm, dd := time.Now().Add(time.Duration(dayIndex) * 24 * time.Hour).Date()
 		date := strconv.Itoa(yy) + "-" + strconv.Itoa(int(mm)) + "-" + strconv.Itoa(dd)
 
@@ -50,20 +51,23 @@ func GetStar(starIndex []int, dayIndex int) (r string, err error) {
 			return
 		}
 
-		t += "【" + stars[i] + "】\n"
-		t1 := []string{}
-		t2 := ""
+		r += "【" + stars[i] + "】\n"
+		tmp1 := []string{}
+		tmp2 := ""
 		doc.Find("div[class=TODAY_CONTENT] p").Each(func(i int, s *goquery.Selection) {
-			t1 = append(t1, s.Text())
+			tmp1 = append(tmp1, s.Text())
 		})
 		for i := 0; i < 8; i++ {
 			if i%4 == 0 {
-				t += t1[i][:9] + t1[i][12:len(t1[i])-3] + "    " + t1[i+2][:9] + t1[i+2][12:len(t1[i])-3] + "\n"
+				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "    " + tmp1[i+2][:9] + tmp1[i+2][12:len(tmp1[i])-3] + "\n"
 			} else if i%2 != 0 {
-				t2 += fmt.Sprintf("%v:\n%v\n", t1[i-1][:9], t1[i])
+				tmp2 += fmt.Sprintf("%v:\n%v\n", tmp1[i-1][:9], tmp1[i])
 			}
 		}
-		t += t2
+		doc.Find("div[class=TODAY_WORD]").Each(func(i int, s *goquery.Selection) {
+			r += "今日短評: " + strings.TrimSpace(s.Text()) + "\n"
+		})
+		r += tmp2
 		return
 	}
 
