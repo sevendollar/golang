@@ -1,7 +1,6 @@
 package star
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -59,7 +58,7 @@ func GetStar(starIndex []int, dayIndex int) (r string, err error) {
 		})
 		for i := 0; i < 8; i++ {
 			if i%4 == 0 {
-				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "    " + tmp1[i+2][:9] + tmp1[i+2][12:len(tmp1[i])-3] + "\n"
+				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "      " + tmp1[i+2][:9] + tmp1[i+2][12:len(tmp1[i])-3] + "\n"
 			} else if i%2 != 0 {
 				tmp2 += fmt.Sprintf("%v:\n%v\n", tmp1[i-1][:9], tmp1[i])
 			}
@@ -71,12 +70,15 @@ func GetStar(starIndex []int, dayIndex int) (r string, err error) {
 		return
 	}
 
-	if len(starIndex) == 0 {
-		err = errors.New("add some indexes")
-		return
-	}
 	var tmp string
+	if len(starIndex) == 0 {
+		starIndex = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+	}
 	for i, v := range starIndex {
+		if v < 0 || v > 11 {
+			err = fmt.Errorf("index out of range: %v", v)
+			return
+		}
 		tmp, err = getInfo(v, dayIndex)
 		if err != nil {
 			return
