@@ -57,14 +57,14 @@ func GetStar(starIndex []int, dayIndex int) (r string, err error) {
 			tmp1 = append(tmp1, s.Text())
 		})
 		for i := 0; i < 8; i++ {
-			if i%4 == 0 {
-				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "      " + tmp1[i+2][:9] + tmp1[i+2][12:len(tmp1[i])-3] + "\n"
+			if i%2 == 0 {
+				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "\n"
 			} else if i%2 != 0 {
 				tmp2 += fmt.Sprintf("%v:\n%v\n", tmp1[i-1][:9], tmp1[i])
 			}
 		}
 		doc.Find("div[class=TODAY_WORD]").Each(func(i int, s *goquery.Selection) {
-			r += "今日短評: " + strings.TrimSpace(s.Text()) + "\n"
+			r += "今日短評: " + strings.TrimSpace(s.Text()) + "\n\n"
 		})
 		r += tmp2
 		return
