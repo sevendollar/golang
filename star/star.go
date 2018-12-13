@@ -79,7 +79,7 @@ func GetDateRange() (minDate, MaxDate string, err error) {
         return
 }
 
-func GetStar(starSignIndex int, date string) (result string, err error) {
+func GetPrediction(starSignIndex int, date string) (result string, err error) {
         if date == "" {
                 yyyy, mm, hh := time.Now().Date()
                 date = fmt.Sprintf("%v-%v-%v", yyyy, int(mm), hh)
