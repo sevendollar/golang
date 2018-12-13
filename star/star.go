@@ -48,6 +48,37 @@ type Prediction struct {
         Finance          string `json:"finance"`
 }
 
+func GetDateRange() (minDate, MaxDate string, err error) {
+        yyyy, mm, hh := time.Now().Date()
+        date = fmt.Sprintf("%v-%v-%v", yyyy, int(mm), hh)
+        url := "http://astro.click108.com.tw/daily_10.php?iType=0&iAstro=0&iAcDay=" + date
+        res, err := http.Get(url)
+        if err != nil {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        defer res.Body.Close()
+        if res.StatusCode != 200 {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        doc, err := goquery.NewDocumentFromReader(res.Body)
+        if err != nil {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        dateLength := doc.Find("select[id=iAcDay] option").Length()
+        doc.Find("select[id=iAcDay] option").Each(func(i int, s *goquery.Selection) {
+                if i == 0 {
+                        firstDate = strings.TrimSpace(s.Text())
+                } else if i == dateLength-1 {
+                        lastDate = strings.TrimSpace(s.Text())
+                }
+        })
+        minDate, MaxDate = firstDate, lastDate
+        return
+}
+
 func GetStar(starSignIndex int, date string) (result string, err error) {
         if date == "" {
                 yyyy, mm, hh := time.Now().Date()
