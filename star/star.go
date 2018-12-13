@@ -1,92 +1,165 @@
 package star
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
+        "encoding/json"
+        "fmt"
+        "net/http"
+        "strconv"
+        "strings"
+        "time"
 
-	"github.com/PuerkitoBio/goquery"
+        "github.com/PuerkitoBio/goquery"
 )
 
 var (
-	stars = []string{
-		"Aries",
-		"Taurus",
-		"Gemini",
-		"Cancer",
-		"Leo",
-		"Virgo",
-		"Libra",
-		"Scorpio",
-		"Sagittarius",
-		"Capricornus",
-		"Aquarius",
-		"Pisces",
-	}
+        date          = ""
+        starSignIndex = 0
+
+        q                     = Astro{}
+        firstDate             = ""
+        lastDate              = ""
+        dateOutOfRange        = false
+        todayLuckyTmp         = []string{}
+        todayContentTmp       = []string{}
+        todayContentRatingTmp = []int{}
+        todayContent          = []string{}
 )
 
-func GetStar(starIndex []int, dayIndex int) (r string, err error) {
-	getInfo := func(i int, dayIndex int) (r string, err error) {
-		yy, mm, dd := time.Now().Add(time.Duration(dayIndex) * 24 * time.Hour).Date()
-		date := strconv.Itoa(yy) + "-" + strconv.Itoa(int(mm)) + "-" + strconv.Itoa(dd)
+type Astro struct {
+        SunSign        string    `json:"sun_sign"`
+        PredictionDate time.Time `json:"prediction_date"`
+        Prediction     Prediction
+}
 
-		ii := strconv.Itoa(i)
-		url := "http://astro.click108.com.tw/daily_" + ii + ".php?iAstro=" + ii + "&iType=0&iAcDay=" + date
-		resp, err := http.Get(url)
-		if err != nil {
-			return
-		}
-		defer resp.Body.Close()
+type Prediction struct {
+        ShortWord        string `json:"short_word"`
+        LuckyNumber      string `json:"lucky_number"`
+        LuckyColor       string `json:"lucky_color"`
+        LuckyDirection   string `json:"lucky_direction"`
+        LuckyTime        string `json:"lucky_time"`
+        LuckyStar        string `json:"lucky_star"`
+        OverviewRating   int    `json:"overview_rating"`
+        Overview         string `json:"overview"`
+        EmotionRating    int    `json:"emotion_rating"`
+        Emotion          string `json:"emotion"`
+        ProfessionRating int    `json:"profession_rating"`
+        Profession       string `json:"profession"`
+        FinanceRating    int    `json:"finance_rating"`
+        Finance          string `json:"finance"`
+}
 
-		if resp.StatusCode != 200 {
-			err = fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
-			return
-		}
+func GetStar(starSignIndex int, date string) (result string, err error) {
+        if date == "" {
+                yyyy, mm, hh := time.Now().Date()
+                date = fmt.Sprintf("%v-%v-%v", yyyy, int(mm), hh)
+        }
+        if starSignIndex < 0 || starSignIndex > 11 {
+                err = fmt.Errorf("%v", `starSignIndex of out range, take one of the flowing number...
+aries=0
+taurus=1
+gemini=2
+cancer=3
+leo=4
+virgo=5
+libra=6
+scorpio=7
+sagittarius=8
+capricorn=9
+aquarius=10
+pisces=11`)
+                return
+        }
+        url := "http://astro.click108.com.tw/daily_10.php?iType=0&iAstro=" + strconv.Itoa(starSignIndex) + "&iAcDay=" + date
+        res, err := http.Get(url)
+        if err != nil {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        defer res.Body.Close()
+        if res.StatusCode != 200 {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        doc, err := goquery.NewDocumentFromReader(res.Body)
+        if err != nil {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        dateLength := doc.Find("select[id=iAcDay] option").Length()
+        doc.Find("select[id=iAcDay] option").Each(func(i int, s *goquery.Selection) {
+                if i == 0 {
+                        firstDate = strings.TrimSpace(s.Text())
+                } else if i == dateLength-1 {
+                        lastDate = strings.TrimSpace(s.Text())
+                }
 
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		if err != nil {
-			return
-		}
+                if _, ok := s.Attr("selected"); ok {
+                        if s.Text() == date {
+                                if q.PredictionDate, err = time.Parse("2006-1-2", s.Text()); err != nil {
+                                        err = fmt.Errorf("%q", err)
+                                        return
+                                }
+                                doc.Find("div[class=TODAY_WORD]").Each(func(i int, s *goquery.Selection) {
+                                        q.Prediction.ShortWord = strings.TrimSpace(s.Text())
+                                })
+                                doc.Find("div[class=TODAY_LUCKY] div[class=LUCKY]").Each(func(i int, s *goquery.Selection) {
+                                        todayLuckyTmp = append(todayLuckyTmp, strings.TrimSpace(s.Text()))
+                                })
+                                doc.Find("div[class=TODAY_CONTENT] h3").Each(func(i int, s *goquery.Selection) {
+                                        star := strings.TrimSpace(s.Text())
+                                        q.SunSign = star[6 : len(star)-6]
+                                })
+                                todayContentLength := doc.Find("div[class=TODAY_CONTENT] p").Length()
+                                doc.Find("div[class=TODAY_CONTENT] p").Each(func(i int, s *goquery.Selection) {
+                                        todayContent = append(todayContent, strings.TrimSpace(s.Text()))
+                                })
+                                for i := 0; i < todayContentLength; i++ {
+                                        if i%2 == 0 {
+                                                x := []byte(todayContent[i][12 : len(todayContent[i])-3])
+                                                xTmp := 0
+                                                for xi := 2; xi < len(x); xi = xi + 3 {
+                                                        if int(x[xi]) == 133 {
+                                                                xTmp++
+                                                        }
+                                                }
+                                                todayContentRatingTmp = append(todayContentRatingTmp, xTmp)
+                                        } else {
+                                                todayContentTmp = append(todayContentTmp, todayContent[i])
+                                        }
 
-		r += "【" + stars[i] + "】\n"
-		tmp1 := []string{}
-		tmp2 := ""
-		doc.Find("div[class=TODAY_CONTENT] p").Each(func(i int, s *goquery.Selection) {
-			tmp1 = append(tmp1, s.Text())
-		})
-		for i := 0; i < 8; i++ {
-			if i%2 == 0 {
-				r += tmp1[i][:9] + tmp1[i][12:len(tmp1[i])-3] + "\n"
-			} else if i%2 != 0 {
-				tmp2 += fmt.Sprintf("%v:\n%v\n", tmp1[i-1][:9], tmp1[i])
-			}
-		}
-		doc.Find("div[class=TODAY_WORD]").Each(func(i int, s *goquery.Selection) {
-			r += "今日短評: " + strings.TrimSpace(s.Text()) + "\n\n"
-		})
-		r += tmp2
-		return
-	}
+                                }
+                                q.Prediction.LuckyNumber = todayLuckyTmp[0]
+                                q.Prediction.LuckyColor = todayLuckyTmp[1]
+                                q.Prediction.LuckyDirection = todayLuckyTmp[2]
+                                q.Prediction.LuckyTime = todayLuckyTmp[3]
+                                q.Prediction.LuckyStar = todayLuckyTmp[4]
 
-	var tmp string
-	if len(starIndex) == 0 {
-		starIndex = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-	}
-	for i, v := range starIndex {
-		if v < 0 || v > 11 {
-			err = fmt.Errorf("index out of range: %v", v)
-			return
-		}
-		tmp, err = getInfo(v, dayIndex)
-		if err != nil {
-			return
-		}
-		r += tmp
-		if i != len(starIndex)-1 {
-			r += "\n"
-		}
-	}
-	return
+                                q.Prediction.Overview = todayContentTmp[0]
+                                q.Prediction.Emotion = todayContentTmp[1]
+                                q.Prediction.Profession = todayContentTmp[2]
+                                q.Prediction.Finance = todayContentTmp[3]
+
+                                q.Prediction.OverviewRating = todayContentRatingTmp[0]
+                                q.Prediction.EmotionRating = todayContentRatingTmp[1]
+                                q.Prediction.ProfessionRating = todayContentRatingTmp[2]
+                                q.Prediction.FinanceRating = todayContentRatingTmp[3]
+
+                                return
+                        } else {
+                                dateOutOfRange = true
+                        }
+                }
+        })
+        if dateOutOfRange {
+                err = fmt.Errorf("date out of range: it should be somewhere between %q and %q", firstDate, lastDate)
+                return
+        }
+
+        jsonDataByte, err := json.MarshalIndent(q, "", "    ")
+        if err != nil {
+                err = fmt.Errorf("%q", err)
+                return
+        }
+        result = string(jsonDataByte)
+        return
 }
