@@ -162,10 +162,10 @@ pisces=11`)
 				q.Prediction.LuckyTime = content["lucky3"]
 				q.Prediction.LuckyStar = content["lucky4"]
 
-				q.Prediction.Overview = content["content1"][:len(content["content1"])-3]
-				q.Prediction.Emotion = content["content3"][:len(content["content3"])-3]
-				q.Prediction.Profession = content["content5"][:len(content["content5"])-3]
-				q.Prediction.Finance = content["content7"][:len(content["content7"])-3]
+				q.Prediction.Overview = content["content1"]
+				q.Prediction.Emotion = content["content3"]
+				q.Prediction.Profession = content["content5"]
+				q.Prediction.Finance = content["content7"]
 
 				q.Prediction.OverviewRating = contentRange["content0"]
 				q.Prediction.EmotionRating = contentRange["content2"]
