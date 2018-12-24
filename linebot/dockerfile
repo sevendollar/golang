@@ -1,0 +1,20 @@
+# build stage
+FROM sevendollar/golang AS build-env
+COPY line /go/src/line
+WORKDIR /go/src/line
+RUN go get -d -v
+RUN mkdir -p /go/bin/line
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags="-w -s" -o /go/bin/line/linebot
+RUN cp -r /go/src/line/cert /go/bin/line
+
+# final stage
+FROM golang:alpine
+# working directory for Lets Encrypt certificates to download to
+WORKDIR /go
+COPY --from=build-env /go/bin/line/* /go/cert/
+RUN mv /go/cert/linebot /go/
+RUN apk add --no-cache tzdata
+RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
+RUN echo Asia/Taipei > /etc/timezone
+EXPOSE 443
+ENTRYPOINT ["/go/linebot"]
