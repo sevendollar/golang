@@ -45,9 +45,9 @@ type Prediction struct {
 }
 
 func GetDateRange() (minDate, MaxDate string, err error) {
-	yyyy, mm, hh := time.Now().Date()
-	date = fmt.Sprintf("%v-%v-%v", yyyy, int(mm), hh)
-	url := "http://astro.click108.com.tw/daily_10.php?iType=0&iAstro=0&iAcDay=" + date
+	yyyy, mm, dd := time.Now().Date()
+	date = fmt.Sprintf("%v-%v-%v", yyyy, timeCorection(int(mm)), timeCorection(dd))
+	url := "http://astro.click108.com.tw/daily_0.php?iType=0&iAstro=0&iAcDay=" + date
 	res, err := http.Get(url)
 	if err != nil {
 		err = fmt.Errorf("%q", err)
@@ -75,13 +75,20 @@ func GetDateRange() (minDate, MaxDate string, err error) {
 	return
 }
 
+func timeCorection(d int) string {
+	if d < 10 {
+		return "0" + fmt.Sprint(d)
+	}
+	return fmt.Sprint(d)
+}
+
 func GetPrediction(starSignIndex int, date string) (result string, err error) {
 	content := map[string]string{}
 	contentRange := map[string]int{}
 
 	if date == "" {
-		yyyy, mm, hh := time.Now().Date()
-		date = fmt.Sprintf("%v-%v-%v", yyyy, int(mm), hh)
+		yyyy, mm, dd := time.Now().Date()
+		date = fmt.Sprintf("%v-%v-%v", yyyy, timeCorection(int(mm)), timeCorection(dd))
 	}
 	if starSignIndex < 0 || starSignIndex > 11 {
 		err = fmt.Errorf("%v", `starSignIndex of out range, take one of the flowing number...
@@ -99,7 +106,7 @@ aquarius=10
 pisces=11`)
 		return
 	}
-	url := "http://astro.click108.com.tw/daily_10.php?iType=0&iAstro=" + strconv.Itoa(starSignIndex) + "&iAcDay=" + date
+	url := "http://astro.click108.com.tw/daily_" + strconv.Itoa(starSignIndex) + ".php?iType=0&iAstro=" + strconv.Itoa(starSignIndex) + "&iAcDay=" + date
 	res, err := http.Get(url)
 	if err != nil {
 		err = fmt.Errorf("%q", err)
@@ -125,7 +132,7 @@ pisces=11`)
 
 		if _, ok := s.Attr("selected"); ok {
 			if s.Text() == date {
-				if q.PredictionDate, err = time.Parse("2006-1-2", s.Text()); err != nil {
+				if q.PredictionDate, err = time.Parse("2006-01-02", s.Text()); err != nil {
 					err = fmt.Errorf("%q", err)
 					return
 				}
