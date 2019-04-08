@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/araddon/dateparse"
 )
 
 var (
@@ -196,5 +197,47 @@ pisces=11`)
 		return
 	}
 	result = string(jsonDataByte)
+	return
+}
+
+func GetStarSign(date string) (r string, err error) {
+	pt, err := dateparse.ParseAny(date)
+	if err != nil {
+		r = ""
+		return
+	}
+	_, mm, dd := pt.Date()
+
+	date = fmt.Sprintf("%d/%d", mm, dd)
+	t, err := dateparse.ParseAny(date)
+
+	switch {
+	case t.After(time.Date(0, time.March, 20, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.April, 20, 0, 0, 0, 0, time.UTC)):
+		r = "aries"
+	case t.After(time.Date(0, time.April, 19, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.May, 21, 0, 0, 0, 0, time.UTC)):
+		r = "taurus"
+	case t.After(time.Date(0, time.May, 20, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.June, 21, 0, 0, 0, 0, time.UTC)):
+		r = "gemini"
+	case t.After(time.Date(0, time.June, 20, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.July, 23, 0, 0, 0, 0, time.UTC)):
+		r = "cancer"
+	case t.After(time.Date(0, time.July, 22, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.August, 23, 0, 0, 0, 0, time.UTC)):
+		r = "leo"
+	case t.After(time.Date(0, time.August, 22, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.September, 23, 0, 0, 0, 0, time.UTC)):
+		r = "virgo"
+	case t.After(time.Date(0, time.September, 22, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.October, 23, 0, 0, 0, 0, time.UTC)):
+		r = "libra"
+	case t.After(time.Date(0, time.October, 22, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.November, 22, 0, 0, 0, 0, time.UTC)):
+		r = "scorpio"
+	case t.After(time.Date(0, time.November, 21, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.December, 22, 0, 0, 0, 0, time.UTC)):
+		r = "sagittatius"
+	case t.After(time.Date(0, time.December, 21, 0, 0, 0, 0, time.UTC)) || t.Before(time.Date(0, time.January, 20, 0, 0, 0, 0, time.UTC)):
+		r = "capricorn"
+	case t.After(time.Date(0, time.January, 19, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.February, 19, 0, 0, 0, 0, time.UTC)):
+		r = "aquarius"
+	case t.After(time.Date(0, time.February, 18, 0, 0, 0, 0, time.UTC)) && t.Before(time.Date(0, time.March, 21, 0, 0, 0, 0, time.UTC)):
+		r = "pisces"
+	default:
+		r = "no match!"
+	}
 	return
 }
