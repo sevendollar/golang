@@ -206,6 +206,7 @@ func GetStarSign(date string) (r string, err error) {
 		r = ""
 		return
 	}
+	fmt.Println(pt.AddDate(0, 0, -266))
 	_, mm, dd := pt.Date()
 
 	date = fmt.Sprintf("%d/%d", mm, dd)
@@ -238,6 +239,21 @@ func GetStarSign(date string) (r string, err error) {
 		r = "pisces"
 	default:
 		r = "no match!"
+	}
+	return
+}
+
+// GetConceivedDay whilch calculates when women get conceived.
+func GetConceivedDay(date string) (r string, err error) {
+	t, err := dateparse.ParseAny(date)
+	if err != nil {
+		return
+	}
+	yy, mm, dd := t.AddDate(0, 0, -266).Date() // -226 = 38 weeks
+	if yy <= 0 {
+		r = fmt.Sprint(mm, dd)
+	} else {
+		r = fmt.Sprint(mm, dd, yy)
 	}
 	return
 }
