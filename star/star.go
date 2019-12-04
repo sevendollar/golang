@@ -1,4 +1,4 @@
-package star
+package main
 
 import (
 	"encoding/json"
@@ -256,4 +256,8 @@ func GetConceivedDay(date string) (r string, err error) {
 		r = fmt.Sprint(mm, dd, yy)
 	}
 	return
+}
+
+func main() {
+
 }
