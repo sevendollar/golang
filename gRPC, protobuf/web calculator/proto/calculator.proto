@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package pb;
+
+message request {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message response {
+  int32 result = 1;
+}
+
+service calculator {
+  rpc add(request) returns (response);
+  rpc subtract(request) returns (response);
+  rpc multiply(request) returns (response);
+  rpc divid(request) returns (response);
+}
