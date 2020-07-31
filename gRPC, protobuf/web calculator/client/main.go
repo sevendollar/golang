@@ -36,6 +36,7 @@ func main() {
 		conn, err := grpc.Dial(":2343", grpc.WithInsecure())
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"err": err})
 		}
 		client := pb.NewCalculatorClient(conn)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1000*time.Millisecond))
@@ -44,6 +45,7 @@ func main() {
 		rlt, err := client.Add(ctx, req)
 		if err != nil {
 			log.Printf("[ERROR] %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"err": err})
 		}
 
 		c.JSON(http.StatusOK, gin.H{"result": rlt.GetResult()})
