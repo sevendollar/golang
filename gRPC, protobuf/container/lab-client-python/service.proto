@@ -1,0 +1,16 @@
+syntax="proto3";
+
+package pb;
+
+service Merge {
+  rpc Do(request) returns (response);
+}
+
+message request {
+  string a = 1;
+  string b = 2;
+}
+
+message response {
+  string message = 1;
+}
