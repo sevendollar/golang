@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package github.com.sevendollar.calculator;
+
+option go_package = "dummypb";
+
+service DummyService {
+  rpc Hello(HelloRequest) returns (HelloResponse);
+  rpc HelloManyTimes(HelloManyTimesRequest) returns (stream HelloManyTimesResponse);
+  rpc LongHello(stream LongHelloRequest) returns (LongHelloResponse);
+  rpc BioHello(stream BioHelloRequest) returns (stream BioHelloResponse);
+}
+
+message BioHelloRequest {
+  string name = 1;
+}
+
+message BioHelloResponse {
+  string message = 1;
+}
+
+message LongHelloRequest {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message LongHelloResponse {
+  string result = 1;
+}
+
+message HelloRequest {
+}
+
+message HelloResponse {
+  string result = 1;
+}
+
+message HelloManyTimesRequest {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message HelloManyTimesResponse {
+  string result = 1;
+}
