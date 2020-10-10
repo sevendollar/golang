@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package github.com.sevendollar.calculator;
+
+option go_package = ".;calpb";
+
+service CalService {
+    rpc Hello(HelloRequest) returns (HelloResponse);
+    rpc HelloWithTimeout(HelloWithTimeoutRequest) returns (HelloWithTimeoutResponse);
+}
+
+message People {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+message HelloWithTimeoutRequest {
+    People name = 1;
+}
+
+message HelloWithTimeoutResponse {
+    string message = 1;
+}
+
+message HelloRequest {
+    People name = 1;
+}
+
+message HelloResponse {
+    string message = 1;
+}
