@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+    name: demo-grpc-client-web-golang
+    labels:
+        name: demo-grpc-client-web-golang
+        app: demo-grpc
+spec:
+    selector:
+        name: demo-grpc-client-web-golang
+        app: demo-grpc
+    ports:
+        - name: http
+          port: 8888
+          targetPort: http

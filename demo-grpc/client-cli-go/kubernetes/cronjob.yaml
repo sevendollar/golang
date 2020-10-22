@@ -1,0 +1,33 @@
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+    name: demo-grpc-client-cli-go
+    labels:
+        name: demo-grpc-client-cli-go
+        app: demo-grpc
+spec:
+    # suspend: true
+    schedule: "*/1 * * * *"
+    jobTemplate:
+        metadata:
+            name: demo-grpc-client-cli-go
+            labels:
+                name: demo-grpc-client-cli-go
+                app: demo-grpc
+        spec:
+            # completions: 1
+            parallelism: 1
+            template:
+                metadata:
+                    name: demo-grpc-client-cli-go
+                    labels:
+                        name: demo-grpc-client-cli-go
+                        app: demo-grpc
+                spec:
+                    restartPolicy: OnFailure
+                    containers:
+                        - name: main
+                          image: sevendollar/demo-grpc-client-cli-go:latest
+                          imagePullPolicy: Always
+                          args:
+                              - "--host=demo-grpc-server"

@@ -1,0 +1,27 @@
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata:
+    name: demo-grpc-server
+    labels:
+        name: demo-grpc-server
+        app: demo-grpc
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            name: demo-grpc-server
+            app: demo-grpc
+    template:
+        metadata:
+            name: demo-grpc-server
+            labels:
+                name: demo-grpc-server
+                app: demo-grpc
+        spec:
+            containers:
+                - name: main
+                  image: sevendollar/demo-grpc-server:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - name: grpc
+                        containerPort: 50051

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+
+package github.com.sevendollar.protobuf.test;
+
+option go_package = ".;greetpb";
+
+service GreetService {
+    rpc Hello(HelloRequest) returns (HelloResponse) {};
+}
+
+message PersonalInfo {
+    int32 id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    repeated string emails = 4;
+    repeated string twitter = 5;
+    int32 age = 6;
+    string sex = 7;
+}
+
+message HelloRequest {
+    PersonalInfo personal_info = 1;
+}
+
+message HelloResponse {
+    string message = 1;
+}

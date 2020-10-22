@@ -1,0 +1,36 @@
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata:
+    name: demo-grpc-client-web-golang
+    labels:
+        name: demo-grpc-client-web-golang
+        app: demo-grpc
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            name: demo-grpc-client-web-golang
+            app: demo-grpc
+    template:
+        metadata:
+            name: demo-grpc-client-web-golang
+            labels:
+                name: demo-grpc-client-web-golang
+                app: demo-grpc
+        spec:
+            volumes:
+                - name: templates
+                  configMap:
+                      name: demo-grpc-client-web-golang
+            containers:
+                - name: main
+                  image: sevendollar/demo-grpc-client-web-golang:k8s
+                  imagePullPolicy: Always
+                  ports:
+                      - name: http
+                        containerPort: 8080
+                  args:
+                      - "--host=demo-grpc-server"
+                  volumeMounts:
+                      - name: templates
+                        mountPath: /templates/
