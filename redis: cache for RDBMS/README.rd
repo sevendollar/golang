@@ -1,0 +1,1 @@
+Redis Cache for slow OR expensive operations like RDBMS
