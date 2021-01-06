@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    {{ template "top.html" }}
+    <title>The Game</title>
+</head>
+
+<body>
+    <center>
+        <h3>The Game</h3><br />
+        <div>
+            <form action="/game_check" method="post" enctype="application/x-www-form-urlencoded">
+                <label>Name:</label>
+                <input type="text" name="name" placeholder="your name" required><br />
+
+                <input type="submit" value="submit"> <input type="reset" value="reset">
+            </form>
+        </div>
+    </center>
+
+    {{ template "bottom.html" }}
+</body>
+
+</html>

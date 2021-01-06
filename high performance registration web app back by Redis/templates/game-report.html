@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{ template "top.html" }}
+    <title>Game Result</title>
+</head>
+
+<body>
+    <center>
+        <h1 class="text-danger">Game Over!</h1>
+        <h4>the ranking is down below.</h4>
+
+        {{ range $index, $element := .names }}
+        <h4 class="text-info">{{ increase $index }}: {{ $element }}</h4>
+        {{ end }}
+
+    </center>
+
+    {{ template "bottom.html" }}
+</body>
+
+</html>
