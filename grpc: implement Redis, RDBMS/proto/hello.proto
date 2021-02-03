@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package github.com.sevendollar.hello;
+
+option go_package = ".;hellopb";
+
+service HelloService {
+    rpc Ping(PingRequest) returns(PingResponse);
+    rpc Hello(HelloRequest) returns(HelloResponse);
+    rpc RedisGet(RedisGetRequest) returns(RedisGetResponse);
+}
+
+message PingRequest {
+}
+
+message PingResponse {
+    string message = 1;
+}
+
+message HelloRequest {
+}
+
+message HelloResponse {
+    string message = 16;
+}
+
+message RedisGetRequest {
+    string key = 1;
+}
+
+message RedisGetResponse {
+    string value = 1;
+}
