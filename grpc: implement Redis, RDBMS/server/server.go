@@ -6,22 +6,29 @@ import (
 	"log"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	hellopb "github.com/sevendollar/pb_test/proto"
 )
 
 type server struct{}
 
 func (*server) Hello(ctx context.Context, req *hellopb.HelloRequest) (*hellopb.HelloResponse, error) {
-	r := &hellopb.HelloResponse{
-		Message: "world",
-	}
 
+	messageCH := make(chan string)
+	var message string
 	wait := make(chan struct{})
 
 	go func() {
+		defer close(messageCH)
+
 		time.Sleep(time.Second * 5)
 
+		messageCH <- "World"
+	}()
+
+	go func() {
+		defer close(wait)
+
+		message = <-messageCH
 		wait <- struct{}{}
 	}()
 
@@ -35,12 +42,13 @@ func (*server) Hello(ctx context.Context, req *hellopb.HelloRequest) (*hellopb.H
 		return nil, fmt.Errorf("timeout")
 
 	case <-wait:
-		log.Println("[gRPC][HelloService][Hello][INFO] CALLER:", req.ProtoReflect().Descriptor().FullName())
-		close(wait)
-
 	}
 
-	return r, nil
+	log.Println("[gRPC][HelloService][Hello][INFO] CALLER:", req.ProtoReflect().Descriptor().FullName())
+
+	return &hellopb.HelloResponse{
+		Message: message,
+	}, nil
 
 }
 
@@ -63,44 +71,39 @@ func (*server) RedisGet(ctx context.Context, req *hellopb.RedisGetRequest) (*hel
 	var r string
 	var err error
 
-	go func() {
-		c := redis.NewClient(&redis.Options{
-			Addr: "localhost:6379",
-		})
-		defer c.Close()
+	// Send the values
+	go getDBWithRedis(ctx, key, rCh, errCh)
 
-		v, err := c.Get(ctx, key).Result()
-		errCh <- err
-		close(errCh)
-		rCh <- v
-		close(rCh)
-	}()
-
+	// Receive the values
 	go func() {
+		defer close(wait)
 		err = <-errCh
 		r = <-rCh
 
+		// Notify when the task is done
 		wait <- struct{}{}
 	}()
 
 	select {
+	// context canceled
 	case <-ctx.Done():
 		log.Printf("[gRPC][HelloService][RedisGet][WARN] CALLER:%v REASON:%v\n", req.ProtoReflect().Descriptor().FullName(), ctx.Err())
 		return nil, ctx.Err()
 
+	// timeout
 	case <-time.After(time.Second * 30):
 		log.Println("[gRPC][HelloService][RedisGet][WARN] REASON:timeout")
 		return nil, fmt.Errorf("timeout")
 
+	// task done
 	case <-wait:
-		close(wait)
 	}
 
 	if err != nil {
 		log.Printf("[gRPC][HelloService][RedisGet][WARN] CALLER:%v REASON:%v\n", req.ProtoReflect().Descriptor().FullName(), err)
 		return nil, err
 	}
-	log.Printf("[gRPC][HelloService][RedisGet][INFO] CALLER:%v\n", req.ProtoReflect().Descriptor().FullName())
+	log.Printf("[gRPC][HelloService][RedisGet][INFO] CALLER:%v, RESPONSE:%v\n", req.ProtoReflect().Descriptor().FullName(), r)
 
 	return &hellopb.RedisGetResponse{
 		Value: r,
