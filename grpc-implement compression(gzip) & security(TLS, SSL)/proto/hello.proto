@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package github.com.sevendollar.hellopb;
+
+option go_package = ".;hellopb";
+
+service HelloService {
+    // implement server-side streaming
+    rpc HelloManyTimes(HelloManyTimesRequest) returns(stream HelloManyTimesResponse);
+}
+
+message HelloManyTimesRequest {
+}
+
+message HelloManyTimesResponse {
+    uint32 message = 1;
+}
