@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package github.com.sevendollar.grpcintercept;
+
+option  go_package = ".;authpb";
+
+service AuthService {
+    rpc Ping(PingRequest) returns(PingResponse);
+    rpc Login(LoginRequest) returns(LoginResponse);
+}
+message PingRequest {
+}
+
+message PingResponse {
+    string Message = 1;
+}
+
+message LoginRequest {
+    string Email = 1;
+    string Password = 2;
+}
+
+message LoginResponse {
+    string AccessToken = 1;
+}

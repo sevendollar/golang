@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package github.com.sevendollar.grpcintercept;
+
+option  go_package = ".;hellopb";
+
+service HelloService {
+    rpc Man(ManRequest) returns(ManResponse);
+    rpc Cat(CatRequest) returns(CatResponse);
+    rpc Dog(DogRequest) returns(DogResponse);
+}
+
+message ManRequest {
+}
+
+message ManResponse {
+    string message = 1;
+}
+
+message CatRequest {
+}
+
+message CatResponse {
+    string message = 1;
+}
+
+message DogRequest {
+}
+
+message DogResponse {
+    string message = 1;
+}

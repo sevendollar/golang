@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package github.com.sevendollar.grpcintercept;
+
+option  go_package = ".;worldpb";
+
+service WorldService {
+    rpc Tuna(TunaRequest) returns(TunaResponse);
+    rpc Beef(BeefRequest) returns(BeefResponse);
+}
+
+message TunaRequest {
+}
+
+message TunaResponse {
+    string message = 1; 
+}
+
+message BeefRequest {
+}
+
+message BeefResponse {
+    string message = 1;
+}
